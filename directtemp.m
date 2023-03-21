@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         a.verbose = verbose;
         [a getTemperature];
         float t = [a.temperature doubleValue];
-        if (toF == TRUE) {
+        if (toF == TRUE && t != -9999.0) {
             t = t * 1.8 + 32.0;
         }
         printf("%.2f", t);
