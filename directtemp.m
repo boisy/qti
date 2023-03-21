@@ -37,6 +37,7 @@
                 break;
             }
         }
+        [self stop];
         return self.temperature;
     }
 }
@@ -54,19 +55,9 @@ int main()
 {
     @autoreleasepool {
         QTIAgent *a = [QTIAgent new];
-        a.vendorID = 0x1DFD;
-        a.productID = 0x0002;
-        [a start];   
-        uint8_t data[16] = {0x32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        while (a.temperature == nil) {
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.0]];
-            if (a.devicePluggedIn == TRUE) {
-                [a sendReport:data length:16];
-            }
-        }
-        
+        a.verbose = TRUE;
+        [a getTemperature];
         printf("%s", [a.temperature cStringUsingEncoding:NSUTF8StringEncoding]);
-        [a stop];
     }
 }
 

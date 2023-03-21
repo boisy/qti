@@ -14,6 +14,7 @@
 @property uint16_t vendorID;
 @property uint16_t productID;
 @property BOOL devicePluggedIn;
+@property BOOL verbose;
 
 - (NSError *)start;
 - (NSError *)stop;

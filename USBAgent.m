@@ -2,8 +2,6 @@
 
 @implementation USBAgent
 
-//#define VERBOSE
-
 #pragma mark -
 #pragma mark C Function Prototypes
 
@@ -92,22 +90,19 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
         {
             CFRelease(gHIDManager);
 			gHIDManager = nil;
-#ifdef VERBOSE
-            NSLog(@"Failed to open the IOHID Manager: %@", [self stringForIOReturn:ioRet]);
-#endif
+			if (self.verbose == TRUE)
+                NSLog(@"Failed to open the IOHID Manager: %@", [self stringForIOReturn:ioRet]);
         }
         else
         {
-#ifdef VERBOSE
-            NSLog(@"IOHID Manager successfully started.");
-#endif
+			if (self.verbose == TRUE)
+                NSLog(@"IOHID Manager successfully started.");
         }
     }
 	else
 	{
-#ifdef VERBOSE
-		NSLog(@"Failed to create an IOHID Manager");
-#endif
+		if (self.verbose == TRUE)
+    		NSLog(@"Failed to create an IOHID Manager");
 	}
 
     
@@ -127,7 +122,7 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
 	{
 		[self setupHidManagerAndCallbacks];
 	}
-	
+
 	return result;
 }
 
@@ -147,9 +142,8 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
 
 - (IOReturn)sendReport:(uint8_t *)reportData length:(CFIndex)length;
 {
-#ifdef VERBOSE
-	NSLog(@"Sending USB data: %@", [NSData dataWithBytes:reportData length:length]);
-#endif
+	if (self.verbose == TRUE)
+    	NSLog(@"Sending USB data: %@", [NSData dataWithBytes:reportData length:length]);
 
     // synchronous
     IOReturn ioReturn = IOHIDDeviceSetReport(gHidDeviceRef,                     // IOHIDDeviceRef for the HID device
@@ -159,9 +153,8 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
                                              length);							// length of the report
     if (kIOReturnSuccess != ioReturn)
 	{
-#ifdef VERBOSE
-	    NSLog(@"IOHIDDeviceSetReport: %@", [self stringForIOReturn:ioReturn]);
-#endif
+		if (self.verbose == TRUE)
+    	    NSLog(@"IOHIDDeviceSetReport: %@", [self stringForIOReturn:ioReturn]);
 	}
 	
 	return ioReturn;
@@ -187,24 +180,21 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
 											   Handle_IOHIDDeviceInputReportCallback,	// the callback routine
 											   (__bridge void *)(self));									// context passed to callback
 
-#ifdef VERBOSE
+		if (self.verbose == TRUE)
             NSLog(@"Device plugged into USB.");
-#endif
     }
 	else
 	{
-#ifdef VERBOSE
+		if (self.verbose == TRUE)
             NSLog(@"Device plugged into USB, but failed to register callback.");
-#endif
 	}
 }
 
 - (void)closeAndReleaseDevice:(IOHIDDeviceRef)hidDeviceRef;
 {
     self.devicePluggedIn = NO;
-#ifdef VERBOSE
-    NSLog(@"Device unplugged from USB.");
-#endif
+	if (self.verbose == TRUE)
+        NSLog(@"Device unplugged from USB.");
 }
 
 #pragma mark -
@@ -241,9 +231,8 @@ static void Handle_DeviceRemovalCallback(void * inContext, IOReturn inResult, vo
 	USBAgent *self = (__bridge USBAgent *)inContext;
 	if (inResult != kIOReturnSuccess)
     {
-#ifdef VERBOSE
-        NSLog(@"Problem with device removal: %@", [self stringForIOReturn:inResult]);
-#endif
+		if (self.verbose == TRUE)
+            NSLog(@"Problem with device removal: %@", [self stringForIOReturn:inResult]);
 		return;
 	}
 	[self closeAndReleaseDevice:inIOHIDDeviceRef];
@@ -274,9 +263,8 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
     @autoreleasepool {
 	USBAgent *agent = (__bridge USBAgent *)inContext;
 
-#ifdef VERBOSE
-    NSLog(@"USB report received [%d]: %@", inResult, [NSData dataWithBytes:inReport length:inReportLength]);
-#endif
+	if (agent.verbose == TRUE)
+        NSLog(@"USB report received [%d]: %@", inResult, [NSData dataWithBytes:inReport length:inReportLength]);
     
 	[agent incomingDataCallback:[NSData dataWithBytes:inReport length:inReportLength]];
     }
@@ -285,9 +273,8 @@ static void Handle_IOHIDDeviceInputReportCallback(void *          inContext,		//
 // Needs to be implemented by a subclass
 - (void)incomingDataCallback:(NSData *)data;
 {
-#ifdef VERBOSE
-	NSLog(@"Received USB data: %@", data);
-#endif
+	if (self.verbose == TRUE)
+    	NSLog(@"Received USB data: %@", data);
 }
 
 @end
