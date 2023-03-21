@@ -56,10 +56,14 @@ int main(int argc, char *argv[])
 {
     int opt;
     BOOL verbose = FALSE;
+    BOOL toF = FALSE;
     
-    while ((opt = getopt(argc, argv, "v")) != -1) { 
+    while ((opt = getopt(argc, argv, "fv")) != -1) { 
         switch(opt) 
         { 
+            case 'f':
+                toF = TRUE;
+                break;
             case 'v': 
                 verbose = TRUE;
                 break; 
@@ -70,7 +74,11 @@ int main(int argc, char *argv[])
         QTIAgent *a = [QTIAgent new];
         a.verbose = verbose;
         [a getTemperature];
-        printf("%s", [a.temperature cStringUsingEncoding:NSUTF8StringEncoding]);
+        float t = [a.temperature doubleValue];
+        if (toF == TRUE) {
+            t = t * 1.8 + 32.0;
+        }
+        printf("%.2f", t);
     }
 }
 
