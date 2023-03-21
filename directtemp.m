@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #import "USBAgent.h"
 
 @interface QTIAgent : USBAgent
@@ -51,11 +52,23 @@
 
 @end
 
-int main()
+int main(int argc, char *argv[])
 {
+    int opt;
+    BOOL verbose = FALSE;
+    
+    while ((opt = getopt(argc, argv, "v")) != -1) { 
+        switch(opt) 
+        { 
+            case 'v': 
+                verbose = TRUE;
+                break; 
+        } 
+    } 
+    
     @autoreleasepool {
         QTIAgent *a = [QTIAgent new];
-        a.verbose = TRUE;
+        a.verbose = verbose;
         [a getTemperature];
         printf("%s", [a.temperature cStringUsingEncoding:NSUTF8StringEncoding]);
     }
